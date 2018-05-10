@@ -9,10 +9,12 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,12 +28,11 @@ public class App extends javax.swing.JFrame {
 
     public App() {
         initComponents();
-        
+
         setBounds(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-        setTitle("Notepad");
+        setTitle("Archivos");
     }
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -44,6 +45,8 @@ public class App extends javax.swing.JFrame {
         txtTexto = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         btnCrearProperties = new javax.swing.JButton();
+        btnLeerProperties = new javax.swing.JButton();
+        btnLeerTodos = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -110,13 +113,32 @@ public class App extends javax.swing.JFrame {
             }
         });
 
+        btnLeerProperties.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        btnLeerProperties.setText("Leer archivo Properties (uno a uno)");
+        btnLeerProperties.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLeerPropertiesActionPerformed(evt);
+            }
+        });
+
+        btnLeerTodos.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        btnLeerTodos.setText("Leer archivo Properties (Todos)");
+        btnLeerTodos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLeerTodosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnCrearProperties, javax.swing.GroupLayout.DEFAULT_SIZE, 938, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCrearProperties, javax.swing.GroupLayout.DEFAULT_SIZE, 938, Short.MAX_VALUE)
+                    .addComponent(btnLeerProperties, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLeerTodos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -124,7 +146,11 @@ public class App extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnCrearProperties)
-                .addContainerGap(297, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLeerProperties)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLeerTodos)
+                .addContainerGap(207, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Properties", jPanel2);
@@ -158,7 +184,7 @@ public class App extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -179,9 +205,9 @@ public class App extends javax.swing.JFrame {
             pw.print(texto);
             pw.close();
             fw.close();
-            
-            txtLog.setText("Ruta: "+archivo.getAbsolutePath()+
-                         "\nTamaño: "+archivo.length()+" bytes");
+
+            txtLog.setText("Ruta: " + archivo.getAbsolutePath()
+                    + "\nTamaño: " + archivo.length() + " bytes");
         } catch (IOException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -189,27 +215,26 @@ public class App extends javax.swing.JFrame {
 
     private void btnLeerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeerActionPerformed
         txtTexto.setText("");
-        
+
         try {
             File archivo = new File("archivo.txt");
-            
-            if(archivo.exists()){
+
+            if (archivo.exists()) {
                 FileReader fr = new FileReader(archivo);
                 BufferedReader br = new BufferedReader(fr);
 
                 String linea;
-                while((linea = br.readLine()) != null){
+                while ((linea = br.readLine()) != null) {
                     System.out.println(linea);
                     txtTexto.setText(txtTexto.getText().concat(linea).concat("\n"));
                 }
 
                 br.close();
                 fr.close();
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "Archivo no existe");
             }
-            
-            
+
         } catch (IOException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -218,28 +243,86 @@ public class App extends javax.swing.JFrame {
     private void btnCrearPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearPropertiesActionPerformed
         // http://chuwiki.chuidiang.org/index.php?title=Leer_y_modificar_fichero_de_propiedades_en_java
         Properties prop = new Properties();
-        
+
         prop.put("server", "10.23.20.12");
         prop.put("port", "8080");
-        
+
         try {
             File archivo = new File("archivo.properties");
             FileWriter fw = new FileWriter(archivo);
-            
+
             prop.store(fw, "Hecho por Patricio Perez Pinto");
-            
-            txtLog.setText("Ruta: "+archivo.getAbsolutePath()+
-                         "\nTamaño: "+archivo.length()+" bytes");
-            
+
+            txtLog.setText("Ruta: " + archivo.getAbsolutePath()
+                    + "\nTamaño: " + archivo.length() + " bytes");
+
             fw.close();
         } catch (IOException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnCrearPropertiesActionPerformed
 
-    
+    private void btnLeerPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeerPropertiesActionPerformed
+
+        try {
+            Properties p = new Properties();
+
+            File archivo = new File("archivo.properties");
+
+            if (archivo.exists()) {
+                FileReader fr = new FileReader(archivo);
+
+                p.load(fr);
+
+                String server, port;
+                server = p.getProperty("server");
+                port = p.getProperty("port");
+
+                txtLog.setText(txtLog.getText().concat(server).concat("\n"));
+                txtLog.setText(txtLog.getText().concat(port).concat("\n"));
+
+                fr.close();
+            } else {
+                JOptionPane.showMessageDialog(this, "Archivo no existe");
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnLeerPropertiesActionPerformed
+
+    private void btnLeerTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeerTodosActionPerformed
+        try {
+            Properties p = new Properties();
+
+            File archivo = new File("archivo.properties");
+
+            if (archivo.exists()) {
+                FileReader fr = new FileReader(archivo);
+
+                p.load(fr);
+
+                Enumeration<Object> keys = p.keys();
+
+                while (keys.hasMoreElements()) {
+                    Object key = keys.nextElement();
+                    txtLog.setText(txtLog.getText().concat(key + " = " + p.get(key)).concat("\n"));
+                }
+
+                fr.close();
+            } else {
+                JOptionPane.showMessageDialog(this, "Archivo no existe");
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnLeerTodosActionPerformed
+
     public static void main(String args[]) {
-       
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new App().setVisible(true);
@@ -251,6 +334,8 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton btnCrear;
     private javax.swing.JButton btnCrearProperties;
     private javax.swing.JButton btnLeer;
+    private javax.swing.JButton btnLeerProperties;
+    private javax.swing.JButton btnLeerTodos;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
